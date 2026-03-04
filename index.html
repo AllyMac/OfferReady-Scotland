@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OfferReady Scotland - Scottish Home Buying Calculator</title>
+<meta name="description" content="Free Scottish home buying calculator. Calculate LBTT, mortgage payments, council tax and compare properties side by side.">
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f1f35; --navy-mid:#1a3050; --navy-light:#243d5c;
+  --green:#1a7f4b; --green-mid:#22a05f; --green-light:#e6f4ed;
+  --amber:#b45309; --amber-light:#fef3c7;
+  --red:#b91c1c; --red-light:#fee2e2;
+  --slate:#475569; --slate-light:#94a3b8;
+  --border:#e2e8f0; --border-mid:#cbd5e1;
+  --bg:#f5f4f1; --bg-card:#ffffff;
+  --text:#0f172a;
+  --radius:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 4px 6px rgba(0,0,0,.07),0 10px 40px rgba(0,0,0,.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+/* hide number spinners everywhere */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+
+.site-header{background:var(--navy);color:white;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3);overflow:hidden}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:white;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--green);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-sub{font-size:11px;font-family:'DM Sans',sans-serif;font-weight:400;opacity:.6;margin-left:2px}
+.header-actions{display:flex;gap:10px;align-items:center}
+.header-action-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px!important}
+.header-btn-icon{font-size:14px;line-height:1}
+.header-btn-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;line-height:1;opacity:.8}
+.save-status{font-size:12px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:5px}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green-mid)}
+
+.main{max-width:1200px;margin:0 auto;padding:32px 24px 80px}
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 60%,var(--navy-mid) 100%);border-radius:16px;padding:48px 48px;color:white;margin-bottom:32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");opacity:.4;pointer-events:none}
+.hero::after{display:none}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;margin-bottom:10px;line-height:1.15;letter-spacing:-.02em}
+.hero p{opacity:.65;font-size:15px;max-width:520px;line-height:1.7}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--navy);letter-spacing:-.01em}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--green);color:white}.btn-primary:hover{background:var(--green-mid)}
+.btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--border-mid)}.btn-ghost:hover{background:var(--bg)}
+.btn-danger{background:var(--red-light);color:var(--red);border:none}.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:6px 12px;font-size:13px}
+
+.property-list{display:flex;flex-direction:column;gap:20px;margin-bottom:32px}
+.property-card{background:var(--bg-card);border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,.07),0 8px 32px rgba(0,0,0,.09);border:1.5px solid var(--border);overflow:visible;transition:box-shadow .2s,transform .2s}
+.property-header{display:flex;align-items:center;gap:12px;padding:18px 20px;background:var(--navy);color:white;cursor:pointer;user-select:none;border-radius:var(--radius) var(--radius) 0 0}
+.property-header.collapsed{border-radius:var(--radius)}
+.property-header-left{flex:1;min-width:0}
+.property-name-input{background:transparent;border:none;color:white;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;width:100%;outline:none;cursor:text}
+.property-name-input::placeholder{color:rgba(255,255,255,.4)}
+.property-name-input:focus{border-bottom:1px solid rgba(255,255,255,.3)}
+.property-meta{font-size:12px;opacity:.6;margin-top:2px}
+.property-chevron{font-size:12px;opacity:.6;transition:transform .2s}
+.property-chevron.open{transform:rotate(180deg)}
+.property-body{padding:20px}
+.property-settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.field input,.field select{padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--green)}
+.field .hint{font-size:11px;color:var(--slate-light)}
+.calc-val{padding:9px 12px;background:var(--green-light);border:1.5px solid #a7d7bc;border-radius:7px;font-size:14px;font-weight:600;color:var(--green)}
+.calc-val.warn{background:var(--amber-light);border-color:#fcd34d;color:var(--amber)}
+
+.offers-section{margin-top:4px}
+.offers-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);margin-bottom:10px}
+.offers-list{display:flex;flex-direction:column;gap:12px}
+
+.offer-card{border:1.5px solid var(--border);border-radius:8px;overflow:visible;background:#fafbfc}
+.offer-card-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--navy-light);color:white;border-radius:8px 8px 0 0}
+.offer-card-header.collapsed{border-radius:8px}
+.offer-number{width:24px;height:24px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.offer-headline{flex:1;font-size:14px;font-weight:500}
+.offer-headline span{opacity:.6;font-size:12px;margin-left:8px}
+.offer-body{padding:14px}
+.offer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+
+.offer-divider{height:1px;background:var(--border);margin:16px 0 14px;position:relative}
+.offer-divider-label{position:absolute;left:0;top:50%;transform:translateY(-50%);background:#fafbfc;padding:0 10px 0 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--navy-light)}
+
+.offer-totals{display:grid;grid-template-columns:repeat(4,1fr);border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-top:4px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.total-cell{padding:16px 14px;background:white;border-right:1px solid var(--border);text-align:center}
+.total-cell:last-child{border-right:none}
+.total-cell.highlight{background:linear-gradient(160deg,#e6f4ed 0%,#d4eddf 100%)}
+.total-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--slate);margin-bottom:6px}
+.total-value{font-size:20px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.total-cell.highlight .total-value{color:var(--green)}
+.total-each{font-size:11px;color:var(--slate-light);margin-top:3px}
+
+.toggle-row{display:flex;align-items:center;gap:8px;padding:2px 0}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border-mid);border-radius:22px;transition:.2s}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked+.toggle-slider{background:var(--green)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
+
+.ftb-badge{display:inline-flex;align-items:center;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px}
+.info-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px;padding:10px 12px;font-size:12px;color:#0369a1;line-height:1.5}
+.tooltip-wrap{position:relative;display:inline-flex;align-items:center}
+.tooltip-btn{width:15px;height:15px;border-radius:50%;background:var(--border-mid);color:var(--slate);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:none;padding:0;margin-left:5px;flex-shrink:0;line-height:1}
+.tooltip-btn:hover{background:var(--slate);color:white}
+.tooltip-box{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:white;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.6;width:240px;z-index:200;box-shadow:var(--shadow-lg);font-weight:400;text-transform:none;letter-spacing:0}
+.tooltip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy)}
+.tooltip-wrap:hover .tooltip-box,.tooltip-btn:focus+.tooltip-box{display:block}
+.info-box.warn{background:var(--amber-light);border-color:#fcd34d;color:var(--amber)}
+
+.comparison-section{margin-bottom:32px}
+.comparison-table-wrap{overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow)}
+.comparison-table{width:100%;border-collapse:collapse;background:white;min-width:700px}
+.comparison-table th{background:var(--navy);color:white;padding:12px 14px;text-align:left;font-size:12px;font-weight:500;white-space:nowrap}
+.comparison-table th.prop-col{background:var(--navy-mid);font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;text-align:center}
+.comparison-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.comparison-table tr:last-child td{border-bottom:none}
+.comparison-table tr.sub-row td{background:var(--bg);font-weight:600}
+.comparison-table tr.tot-row td{background:var(--green-light);font-weight:700;color:var(--green)}
+.comparison-table tr.tot-row td:first-child{color:var(--navy)}
+.comparison-table td.row-label{color:var(--slate);font-weight:500;background:#f8fafc;border-right:1px solid var(--border)}
+.comparison-table tbody tr:nth-child(even) td{background:#f0f4fa}
+.comparison-table tbody tr:nth-child(even) td.row-label{background:#e8eef7;color:var(--navy-mid)}
+.comparison-table tr.sub-row td{background:var(--bg)!important;font-weight:600}
+.comparison-table tr.sub-row td.row-label{background:#eef1f5!important;color:var(--navy)!important}
+.comparison-table tr.tot-row td{background:var(--green-light)!important;font-weight:700;color:var(--green)}
+.comparison-table tr.tot-row td:first-child,.comparison-table tr.tot-row td.row-label{color:var(--navy)!important;background:var(--green-light)!important}
+.comparison-table td.prop-sep{border-left:3px solid var(--navy-mid)!important}
+.comparison-table td.best{background:#d1fae5!important}
+.comparison-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+.affordability-section{background:var(--bg-card);border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden;margin-bottom:32px;box-shadow:var(--shadow)}
+.afford-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;background:#fafbfc;border-bottom:1px solid var(--border)}
+.afford-header h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--navy)}
+.afford-body{padding:20px;display:none}
+.afford-body.open{display:block}
+.afford-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.afford-bar-label{font-size:12px;color:var(--slate);width:220px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.afford-bar-track{flex:1;height:20px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.afford-bar-fill{height:100%;border-radius:4px;transition:width .3s;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;font-weight:600;color:white}
+.afford-bar-fill.green{background:var(--green)}.afford-bar-fill.amber{background:#d97706}.afford-bar-fill.red{background:var(--red)}
+.afford-legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+.afford-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate)}
+.afford-legend-dot{width:10px;height:10px;border-radius:50%}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--slate)}
+.empty-state .ei{font-size:48px;margin-bottom:16px}
+.empty-state h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);margin-bottom:8px}
+.empty-state p{font-size:14px;margin-bottom:20px}
+.no-offers{text-align:center;padding:20px;color:var(--slate-light);font-size:13px;border:1.5px dashed var(--border);border-radius:7px}
+
+.site-footer{background:var(--navy);color:rgba(255,255,255,.5);padding:24px;font-size:12px;line-height:1.7;text-align:center}
+.site-footer a{color:rgba(255,255,255,.6);text-decoration:none}
+.site-footer a:hover{color:white}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:12px 18px;border-radius:8px;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(8px);transition:all .2s;z-index:1000;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Prevent table from busting page width on mobile */
+body{overflow-x:hidden}
+.comparison-section{overflow:hidden}
+
+@media(max-width:640px){
+  .site-header{padding:0 12px}
+  .header-inner{height:52px;gap:8px}
+  .logo-sub{font-size:11px;margin-left:4px}.save-status{display:none}
+  .logo{font-size:20px}
+  .header-actions{gap:6px}
+  .hero{padding:28px 20px}.hero h1{font-size:26px}.hero p{font-size:13px}.hero::after{display:none}.hero::before{display:none}
+  .main{padding:16px 12px 60px}
+  #settings-strip{padding:10px 14px;gap:12px}
+  .property-header{padding:12px 14px}
+  .property-body{padding:14px}
+  .property-settings{grid-template-columns:1fr 1fr;gap:10px}
+  .offer-grid{grid-template-columns:1fr 1fr}
+  .offer-body{padding:10px}
+  .offer-card-header{flex-wrap:wrap;gap:6px}
+  .offer-totals{grid-template-columns:repeat(2,1fr)}
+  .offer-totals .total-cell:nth-child(2){border-right:none}
+  .offer-totals .total-cell:nth-child(3){border-top:1px solid var(--border)}
+  .section-header{flex-wrap:wrap;gap:8px}
+  .section-title{font-size:19px}
+  .afford-bar-row{flex-wrap:wrap}
+  .afford-bar-label{width:auto;flex:1;font-size:12px}
+  .afford-bar-track{order:3;flex:0 0 100%;margin-top:4px}
+  .afford-bar-row>span{font-size:12px;text-align:right}
+  .tooltip-box{left:auto;right:0;transform:none}
+  .tooltip-box::after{left:auto;right:12px;transform:none}
+  .desktop-only{display:none}
+  .header-btn-label{display:block}
+}
+@media print{
+  .site-header,.header-actions,.hero,.btn,.afford-header{display:none!important}
+  body{background:white}
+  .property-card,.offer-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <img src="logo.png" alt="OfferReady Scotland" style="height:32px;width:auto">
+        <span style="display:flex;flex-direction:column;line-height:1.1">OfferReady<span style="font-size:11px;opacity:.5;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:.12em;text-transform:uppercase; padding-left: 0.2rem;">Scotland</span></span>
+      <!-- <span class="logo-sub">Scotland</span> -->
+    </a>
+    <div class="header-actions">
+      <span class="save-status"><span class="save-dot"></span>Saved locally</span>
+      <button class="btn btn-sm header-action-btn" style="background:white;color:var(--navy);font-weight:600;border:none" onclick="exportPDF()"><span class="header-btn-icon">⬇</span><span class="header-btn-label">Export PDF</span></button>
+      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="shareState()"><span class="header-btn-icon">⤴</span><span class="header-btn-label">Share</span></button>
+      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="clearAll()"><span class="header-btn-icon">↺</span><span class="header-btn-label">Clear</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="hero">
+    <h1>Scottish Home Buying Calculator</h1>
+    <p>Compare properties, calculate LBTT, mortgage payments and council tax - all in one place. Your data is saved in your browser, never sent anywhere.</p>
+  </div>
+
+<div id="settings-strip" style="background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px 24px;margin-bottom:28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.06)">    <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate)">Settings</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);white-space:nowrap">Number of buyers</label>
+      <select id="global-buyers" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:14px;background:white;outline:none;width:70px" onchange="updBuyers(this.value)">
+        <option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option>
+      </select>
+    </div>
+    <span style="font-size:12px;color:var(--slate-light)">Splits costs equally across all buyers</span>
+    <div style="width:1px;height:24px;background:var(--border)"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);white-space:nowrap">Include Council Tax</label>
+      <label class="toggle"><input type="checkbox" id="global-ct" checked onchange="updIncludeCT(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+    <span style="font-size:12px;color:var(--slate-light)">Toggle off if already accounted for</span>
+  </div>
+  <div class="section-header">
+    <h2 class="section-title">Your Properties</h2>
+    <button class="btn btn-primary" onclick="addProperty()">+ Add Property</button>
+  </div>
+  <div id="property-list" class="property-list"></div>
+
+  <div id="comparison-section" class="comparison-section" style="display:none">
+    <div class="section-header">
+      <h2 class="section-title">Comparison</h2>
+    </div>
+    <div class="comparison-table-wrap">
+      <table class="comparison-table" id="comparison-table"></table>
+    </div>
+  </div>
+
+  <div class="affordability-section">
+    <div class="afford-header" onclick="toggleAffordability()">
+      <h3><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="var(--navy)" viewBox="0 0 256 256" style="vertical-align:-4px;margin-right:8px"><path d="M244.24,60a8,8,0,0,0-7.75-.4c-42.93,21-73.59,11.16-106,.78-34-10.89-69.25-22.14-117.95,1.64A8,8,0,0,0,8,69.24V189.17a8,8,0,0,0,11.51,7.19c42.93-21,73.59-11.16,106.05-.78,19.24,6.15,38.84,12.42,61,12.42,17.09,0,35.73-3.72,56.91-14.06a8,8,0,0,0,4.49-7.18V66.83A8,8,0,0,0,244.24,60ZM232,181.67c-40.6,18.17-70.25,8.69-101.56-1.32-19.24-6.15-38.84-12.42-61-12.42a122,122,0,0,0-45.4,9V74.33c40.6-18.17,70.25-8.69,101.56,1.32S189.14,96,232,79.09ZM128,96a32,32,0,1,0,32,32A32,32,0,0,0,128,96Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,144ZM56,96v48a8,8,0,0,1-16,0V96a8,8,0,1,1,16,0Zm144,64V112a8,8,0,1,1,16,0v48a8,8,0,1,1-16,0Z"></path></svg>Can I Afford This? <span style="font-size:13px;font-family:'DM Sans';font-weight:400;opacity:.6;margin-left:8px">Optional</span></h3>
+      <span id="afford-chevron" style="font-size:12px;color:var(--slate)">▼ expand</span>
+    </div>
+    <div id="afford-body" class="afford-body">
+      <p style="font-size:13px;color:var(--slate);margin-bottom:16px">Enter your combined monthly take-home. This is a rough guide - only you know your full financial picture.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+        <div class="field" style="width:240px">
+          <label>Combined Monthly Take-Home (£)</label>
+          <input type="number" id="afford-income" placeholder="e.g. 4500" inputmode="numeric" oninput="state.affordIncome=this.value;saveState();renderAffordability()">
+        </div>
+      </div>
+      <div id="afford-bars"></div>
+      <div class="afford-legend">
+        <div class="afford-legend-item"><div class="afford-legend-dot" style="background:var(--green)"></div>Under 30% - comfortable</div>
+        <div class="afford-legend-item"><div class="afford-legend-dot" style="background:#d97706"></div>30-40% - stretched</div>
+        <div class="afford-legend-item"><div class="afford-legend-dot" style="background:var(--red)"></div>Over 40% - very stretched</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div style="max-width:800px;margin:0 auto">
+    <p><strong style="color:rgba(255,255,255,.8)">OfferReady Scotland</strong> - Free Scottish home buying calculator</p>
+    <p style="margin-top:8px">Council tax figures include Scottish Water charges and are sourced from council websites (2025/26). Rates change each April - always verify with your council. LBTT rates per Revenue Scotland. For guidance only - not financial or legal advice.</p>
+    <p style="margin-top:8px"><a href="#" onclick="showPrivacy()">Privacy Policy</a> &nbsp;·&nbsp; <a href="mailto:contact@offerready.co.uk">Contact</a> &nbsp;·&nbsp; All data stored locally in your browser &nbsp;·&nbsp; Built for Scotland
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+// Band D council tax only (excl. Scottish Water). Source: Scottish Government CTAS 2025-26.
+// Update each April: gov.scot/publications/council-tax-datasets/
+const COUNCILS={
+  "Aberdeen City":1636.27,"Aberdeenshire":1532.76,"Angus":1461.52,"Argyll & Bute":1625.64,
+  "Clackmannanshire":1594.38,"Dumfries & Galloway":1454.98,"Dundee City":1605.34,
+  "East Ayrshire":1606.44,"East Dunbartonshire":1599.70,"East Lothian":1579.18,
+  "East Renfrewshire":1528.44,"Edinburgh, City of":1563.51,"Na h-Eileanan Siar":1387.56,
+  "Falkirk":1576.77,"Fife":1498.76,"Glasgow City":1611.00,"Highland":1527.09,
+  "Inverclyde":1551.30,"Midlothian":1666.20,"Moray":1573.76,"North Ayrshire":1553.77,
+  "North Lanarkshire":1452.86,"Orkney Islands":1574.60,"Perth & Kinross":1537.04,
+  "Renfrewshire":1572.61,"Scottish Borders":1491.72,"Shetland Islands":1386.67,
+  "South Ayrshire":1569.41,"South Lanarkshire":1378.85,"Stirling":1611.78,
+  "West Dunbartonshire":1559.86,"West Lothian":1515.45
+};
+// National multipliers set by Scottish Parliament. A-D since 1993; E-H revised upward 2017.
+const BANDS={"A":240/360,"B":280/360,"C":320/360,"D":1,"E":473/360,"F":585/360,"G":705/360,"H":882/360};
+// Scottish Water unmetered charges 2025/26 - national, same for all councils.
+// Update each April from the Scottish Water Unmetered Household Charges leaflet.
+const SW_WATER=   {"A":185.28,"B":216.16,"C":247.04,"D":277.92,"E":339.68,"F":401.44,"G":463.20,"H":555.84};
+const SW_SEWERAGE={"A":214.98,"B":250.81,"C":286.64,"D":322.47,"E":394.13,"F":465.79,"G":537.45,"H":644.94};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let state={properties:[],affordOpen:false,buyers:2,affordIncome:'',includeCT:true};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const newProp=()=>({id:uid(),name:'',council:'Aberdeen City',band:'D',hrv:'',collapsed:false,offers:[]});
+const newOffer=()=>({id:uid(),offerAmount:'',isFirstTimeBuyer:false,isAdditionalDwelling:false,
+  deposit:'',mortgageRate:4.5,mortgageTerm:25,solicitorFees:'',otherMonthly:'',collapsed:false});
+
+// ── MATHS ─────────────────────────────────────────────────────────────────
+function calcLBTT(amount,ftb,ads){
+  amount=parseFloat(amount)||0; if(amount<=0) return 0;
+  const bands=ftb
+    ?[[0,175000,0],[175000,250000,.02],[250000,325000,.05],[325000,750000,.10],[750000,Infinity,.12]]
+    :[[0,145000,0],[145000,250000,.02],[250000,325000,.05],[325000,750000,.10],[750000,Infinity,.12]];
+  let tax=0;
+  for(const[lo,hi,r]of bands) if(amount>lo) tax+=(Math.min(amount,hi)-lo)*r;
+  if(ads) tax+=amount*0.08;
+  return Math.round(tax);
+}
+function calcMortgage(offer,deposit,hrv,rate,term){
+  offer=parseFloat(offer)||0; deposit=parseFloat(deposit)||0;
+  hrv=parseFloat(hrv)||0; rate=parseFloat(rate)||0; term=parseFloat(term)||25;
+  const mortgeable=hrv>0?Math.min(offer,hrv):offer;
+  const principal=mortgeable-deposit;
+  if(principal<=0||rate<=0) return 0;
+  const r=rate/100/12,n=term*12;
+  return Math.round(principal*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)*100)/100;
+}
+function calcCT(council,band){
+  const ct=(COUNCILS[council]||0)*(BANDS[band]||1);
+  const sw=(SW_WATER[band]||0)+(SW_SEWERAGE[band]||0);
+  return Math.round((ct+sw)/12*100)/100;
+}
+function compute(o,p){
+  const offer=parseFloat(o.offerAmount)||0, hrv=parseFloat(p.hrv)||0;
+  const deposit=parseFloat(o.deposit)||0, sol=parseFloat(o.solicitorFees)||0;
+  const other=parseFloat(o.otherMonthly)||0;
+  const lbtt=calcLBTT(offer,o.isFirstTimeBuyer,o.isAdditionalDwelling);
+  const mtg=calcMortgage(offer,deposit,hrv,o.mortgageRate,o.mortgageTerm);
+  const ct=calcCT(p.council,p.band);
+  const overHRV=hrv>0&&offer>hrv?offer-hrv:0;
+  const mortgeable=hrv>0?Math.min(offer,hrv):offer;
+  const ctAmt=state.includeCT?ct:0;
+  return{lbtt,mtg,ct,sol,other,deposit,overHRV,
+    upfront:lbtt+deposit+sol+overHRV,
+    monthly:mtg+ctAmt+other,
+    principal:Math.max(0,mortgeable-deposit),
+    ltv:(mortgeable>0&&(mortgeable-deposit)>0)?Math.round((Math.max(0,mortgeable-deposit)/mortgeable)*1000)/10:0};
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────────────
+const fmt=(n,dp=0)=>(!n&&n!==0)||isNaN(Number(n))?'-':'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:dp,maximumFractionDigits:dp});
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ── FULL RENDER ───────────────────────────────────────────────────────────
+// Only called for structural changes: add/remove, toggle collapse, change select/toggle
+function render(){renderProperties();renderComparison();renderAffordability();saveState();}
+
+function renderProperties(){
+  const el=document.getElementById('property-list');
+  if(!state.properties.length){
+    el.innerHTML=`<div class="empty-state"><div class="ei"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="var(--navy)" viewBox="0 0 256 256"><path d="M240,208H224V136l2.34,2.34A8,8,0,0,0,237.66,127L139.31,28.68a16,16,0,0,0-22.62,0L18.34,127a8,8,0,0,0,11.32,11.31L32,136v72H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,120l80-80,80,80v88H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48Zm96,88H112V160h32Z"></path></svg></div><h3>Add your first property</h3><p>Start by adding a property, then add offer scenarios.</p><button class="btn btn-primary" onclick="addProperty()">+ Add Property</button></div>`;
+    return;
+  }
+  el.innerHTML=state.properties.map(renderPropCard).join('');
+}
+
+function renderPropCard(p){
+  const coOpts=Object.keys(COUNCILS).sort().map(c=>`<option value="${c}"${c===p.council?' selected':''}>${c}</option>`).join('');
+  const bdOpts=Object.keys(BANDS).map(b=>`<option value="${b}"${b===p.band?' selected':''}>${b}</option>`).join('');
+  const ct=calcCT(p.council,p.band);
+  const offersHTML=p.offers.length?p.offers.map((o,i)=>renderOfferCard(o,i,p)).join(''):`<div class="no-offers">No offers yet - click "Add Offer" to get started</div>`;
+  return`<div class="property-card" id="prop-${p.id}">
+  <div class="property-header ${p.collapsed?'collapsed':''}" onclick="toggleProp('${p.id}')">
+    <div class="property-header-left">
+      <input class="property-name-input" value="${esc(p.name)}" placeholder="Property name or address"
+        onclick="event.stopPropagation()" oninput="updPropStr('${p.id}','name',this.value)">
+      <div class="property-meta" id="pmeta-${p.id}">${p.council} · Band ${p.band}${p.hrv?' · HRV '+fmt(p.hrv):''} · Council Tax ~${fmt(ct,0)}/mo</div>
+    </div>
+    <span style="font-size:12px;opacity:.6">${p.offers.length} offer${p.offers.length!==1?'s':''}</span>
+    <span class="property-chevron ${p.collapsed?'':'open'}">▼</span>
+  </div>
+  <div class="property-body"${p.collapsed?' style="display:none"':''}>
+    <div class="property-settings">
+      <div class="field"><label>Council</label>
+        <select onchange="updPropSelect('${p.id}','council',this.value)">${coOpts}</select></div>
+      <div class="field"><label>Council Tax Band</label>
+        <select onchange="updPropSelect('${p.id}','band',this.value)">${bdOpts}</select>
+        <span class="hint">~${fmt(ct,2)}/month incl. Scottish Water</span></div>
+      <div class="field"><label>Home Report Value (£)</label>
+        <input type="number" value="${p.hrv}" placeholder="e.g. 195000" inputmode="numeric"
+          oninput="updPropNum('${p.id}','hrv',this.value)">
+        <span class="hint">Sets the mortgageable limit</span></div>
+      <div class="field" style="justify-content:flex-end">
+        <button class="btn btn-danger" style="font-size:12px;padding:6px 10px;align-self:flex-end" onclick="removeProp('${p.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="var(--red)" viewBox="0 0 256 256" style="vertical-align:-2px"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg> Remove</button>
+      </div>
+    </div>
+    <div class="offers-section">
+      <div class="section-header">
+        <div class="offers-label">Offer Scenarios</div>
+        <button class="btn btn-primary btn-sm" onclick="addOffer('${p.id}')">+ Add Offer</button>
+      </div>
+      <div class="offers-list">${offersHTML}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+function renderOfferCard(o,oi,p){
+  const c=compute(o,p);
+  const offer=parseFloat(o.offerAmount)||0, hrv=parseFloat(p.hrv)||0;
+  const noHRV=hrv===0&&offer>0;
+  const lbttStd=calcLBTT(offer,false,o.isAdditionalDwelling);
+  const ftbSave=lbttStd-c.lbtt;
+  const i=o.id; // shorthand for id suffix
+  return`<div class="offer-card" id="offer-${i}">
+  <div class="offer-card-header ${o.collapsed?'collapsed':''}" onclick="toggleOffer('${p.id}','${i}')" style="cursor:pointer">
+    <div class="offer-number">${oi+1}</div>
+    <div class="offer-headline" id="ohl-${i}">${offerHeadlineHTML(o,c)}</div>
+    <span class="property-chevron ${o.collapsed?'':'open'}" style="opacity:.6;font-size:11px;margin-right:4px">▼</span>
+    <button class="btn btn-ghost btn-sm" style="padding:5px 9px;border-color:rgba(255,255,255,.3);color:white;background:rgba(255,255,255,.08)" onclick="event.stopPropagation();dupOffer('${p.id}','${i}')" title="Duplicate offer">⧉ Duplicate</button>
+    <button class="btn btn-danger btn-sm" style="padding:5px 9px" onclick="event.stopPropagation();removeOffer('${p.id}','${i}')">✕</button>
+  </div>
+  <div class="offer-body"${o.collapsed?' style="display:none"':''}>
+    <div class="offer-divider"><span class="offer-divider-label">Offer &amp; Purchase Costs</span></div>
+    <div class="offer-grid">
+      <div class="field"><label>Offer Amount (£)</label>
+        <input type="number" value="${o.offerAmount}" placeholder="e.g. 200000" inputmode="numeric"
+          oninput="updOfferNum('${p.id}','${i}','offerAmount',this.value)"></div>
+      <div class="field"><label style="display:flex;align-items:center">LBTT (auto-calculated)<span class="tooltip-wrap"><button class="tooltip-btn" onclick="event.stopPropagation()">?</button><span class="tooltip-box"><strong>Land & Buildings Transaction Tax</strong><br>Scotland's property purchase tax.<br><br>Standard bands:<br>Up to £145k - 0%<br>£145k-£250k - 2%<br>£250k-£325k - 5%<br>£325k-£750k - 10%<br>Over £750k - 12%<br><br>FTB relief raises the 0% band to £175k.<br>ADS adds 8% on top for additional dwellings (from Dec 2024).</span></span></label>
+        <div class="calc-val" id="lbtt-${i}">${fmt(c.lbtt)}</div>
+        <div id="lbtt-hint-${i}">${lbttHintHTML(o,ftbSave)}</div></div>
+      <div class="field"><label>Deposit (£)</label>
+        <input type="number" value="${o.deposit}" placeholder="e.g. 20000" inputmode="numeric"
+          oninput="updOfferNum('${p.id}','${i}','deposit',this.value)">
+        <span class="hint warn-text" id="dep-warn-${i}" style="display:none;color:var(--amber)"></span></div>
+      <div class="field"><label>Solicitor Fees (£)</label>
+        <input type="number" value="${o.solicitorFees}" placeholder="e.g. 2000-2500" inputmode="numeric"
+          oninput="updOfferNum('${p.id}','${i}','solicitorFees',this.value)"></div>
+      <div class="field" id="overhrv-${i}" style="${c.overHRV>0?'':'display:none'}">
+        <label>Over HRV (upfront, not mortgageable)</label>
+        <div class="calc-val warn" id="overhrv-val-${i}">${fmt(c.overHRV)}</div>
+        <span class="hint">Added to upfront costs automatically</span></div>
+      <div class="field"><label>Options</label>
+        <div style="display:flex;flex-direction:column;gap:8px;padding-top:4px">
+          <div class="toggle-row"><label class="toggle">
+            <input type="checkbox"${o.isFirstTimeBuyer?' checked':''}
+              onchange="updOfferToggle('${p.id}','${i}','isFirstTimeBuyer',this.checked)">
+            <span class="toggle-slider"></span></label><label>First Time Buyer</label></div>
+          <div class="toggle-row"><label class="toggle">
+            <input type="checkbox"${o.isAdditionalDwelling?' checked':''}
+              onchange="updOfferToggle('${p.id}','${i}','isAdditionalDwelling',this.checked)">
+            <span class="toggle-slider"></span></label><label>Additional Dwelling (+8% ADS)</label></div>
+        </div>
+      </div>
+    </div>
+    <div id="ftb-info-${i}">${o.isFirstTimeBuyer?`<div class="info-box" style="margin-bottom:8px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#0369a1" viewBox="0 0 256 256" style="vertical-align:-2px;margin-right:4px"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path></svg><strong>FTB LBTT relief</strong> raises the 0% band from £145,000 to £175,000 - saving a maximum of £600. It applies at any price.</div>`:''}
+    </div>
+
+    <div class="offer-divider" style="margin-top:8px"><span class="offer-divider-label">Mortgage</span></div>
+    <div id="mtg-warn-${i}" style="${noHRV?'':'display:none'}">
+      <div class="info-box warn" style="margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--amber)" viewBox="0 0 256 256" style="vertical-align:-2px;margin-right:4px"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg> No Home Report Value set - mortgage is based on full offer amount. Add the HRV above for an accurate figure.</div></div>
+    <div class="offer-grid">
+      <div class="field"><label>Loan Amount</label>
+        <div class="calc-val${noHRV?' warn':''}" id="principal-${i}">${c.principal>0?fmt(c.principal):'-'}</div>
+        <span class="hint" id="ltv-hint-${i}">${hrv>0?'min(offer,HRV)':'Offer'} minus deposit${c.ltv>0?` · <strong>${c.ltv}% LTV</strong>`:''}</span></div>
+      <div class="field"><label>Interest Rate (%)</label>
+        <input type="number" step="0.01" value="${o.mortgageRate}" placeholder="e.g. 4.5" inputmode="decimal"
+          oninput="updOfferNum('${p.id}','${i}','mortgageRate',this.value)">
+        <span class="hint warn-text" id="rate-warn-${i}" style="display:none;color:var(--amber)"></span>
+      </div>
+      <div class="field"><label>Term (years)</label>
+        <input type="number" value="${o.mortgageTerm}" placeholder="25" inputmode="numeric"
+          oninput="updOfferNum('${p.id}','${i}','mortgageTerm',this.value)"></div>
+      <div class="field"><label>Monthly Payment (auto)</label>
+        <div class="calc-val" id="mtgpm-${i}">${c.mtg>0?fmt(c.mtg,2):'-'}</div></div>
+    </div>
+
+    <div class="offer-divider"><span class="offer-divider-label">Monthly Costs</span></div>
+    <div class="offer-grid">
+      <div class="field"><label>Council Tax PM (auto)</label>
+        <div class="calc-val" id="ct-${i}">${fmt(c.ct,2)}</div>
+        <span class="hint">Incl. Scottish Water - from council &amp; band above</span></div>
+      <div class="field"><label>Other Monthly Bills (£)</label>
+        <input type="number" value="${o.otherMonthly}" placeholder="e.g. 200" inputmode="numeric"
+          oninput="updOfferNum('${p.id}','${i}','otherMonthly',this.value)">
+        <span class="hint">Energy, broadband, factor fees etc. combined</span></div>
+    </div>
+
+    <div class="offer-divider"><span class="offer-divider-label">Summary</span></div>
+    <div class="offer-totals">
+      <div class="total-cell">
+        <div class="total-label">Total Upfront</div>
+        <div class="total-value" id="tot-upfront-${i}">${fmt(c.upfront)}</div>
+        <div class="total-each" id="tot-upfront-ea-${i}">per buyer: ${fmt(c.upfront/state.buyers)}</div>
+      </div>
+      <div class="total-cell highlight">
+        <div class="total-label">Total Monthly</div>
+        <div class="total-value" id="tot-monthly-${i}">${fmt(c.monthly,2)}</div>
+        <div class="total-each" id="tot-monthly-ea-${i}">per buyer: ${fmt(c.monthly/state.buyers,2)}</div>
+      </div>
+      <div class="total-cell">
+        <div class="total-label">Year 1 Total</div>
+        <div class="total-value" id="tot-year1-${i}">${fmt(c.upfront+c.monthly*12)}</div>
+        <div class="total-each" id="tot-year1-ea-${i}">per buyer: ${fmt((c.upfront+c.monthly*12)/state.buyers)}</div>
+      </div>
+      <div class="total-cell">
+        <div class="total-label">Mortgage Over Term</div>
+        <div class="total-value" style="font-size:13px" id="tot-term-${i}">${c.mtg>0?fmt(c.mtg*(parseFloat(o.mortgageTerm)||25)*12):'-'}</div>
+        <div class="total-each" id="tot-term-lbl-${i}">${o.mortgageTerm||25} years</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// Helpers for re-renderable sub-fragments
+function offerHeadlineHTML(o,c){
+  const offer=parseFloat(o.offerAmount)||0;
+  return`${offer?fmt(offer):'New Offer'}${o.isFirstTimeBuyer?'<span class="ftb-badge">FTB</span>':''}${o.isAdditionalDwelling?'<span class="ftb-badge" style="background:#fde8d8;color:#9a3412">ADS+6%</span>':''}${c.overHRV>0?`<span style="color:#fcd34d;font-size:12px;margin-left:8px">+${fmt(c.overHRV)} over HRV - paid upfront</span>`:''}`;
+}
+function lbttHintHTML(o,ftbSave){
+  if(!o.isFirstTimeBuyer) return '';
+  return ftbSave>0
+    ?`<span class="hint" style="color:var(--green)">FTB saves ${fmt(ftbSave)} vs standard</span>`
+    :`<span class="hint">FTB makes no difference at this price</span>`;
+}
+
+// ── SOFT UPDATE ───────────────────────────────────────────────────────────
+// Called by number inputs - patches computed display elements only, never touches inputs
+function softUpdate(p,o){
+  const c=compute(o,p);
+  const offer=parseFloat(o.offerAmount)||0, hrv=parseFloat(p.hrv)||0;
+  const noHRV=hrv===0&&offer>0;
+  const lbttStd=calcLBTT(offer,false,o.isAdditionalDwelling);
+  const ftbSave=lbttStd-c.lbtt;
+  const id=o.id;
+  const $=(i)=>document.getElementById(i);
+  const set=(i,h)=>{const e=$(i);if(e)e.innerHTML=h;};
+  const txt=(i,t)=>{const e=$(i);if(e)e.textContent=t;};
+  const show=(i,v)=>{const e=$(i);if(e)e.style.display=v?'':'none';};
+  const cls=(i,c,on)=>{const e=$(i);if(e)e.classList.toggle(c,on);};
+
+  set(`ohl-${id}`, offerHeadlineHTML(o,c));
+  txt(`lbtt-${id}`, fmt(c.lbtt));
+  set(`lbtt-hint-${id}`, lbttHintHTML(o,ftbSave));
+  show(`overhrv-${id}`, c.overHRV>0);
+  txt(`overhrv-val-${id}`, fmt(c.overHRV));
+  show(`mtg-warn-${id}`, noHRV);
+  txt(`principal-${id}`, c.principal>0?fmt(c.principal):'-');
+  set(`ltv-hint-${id}`, `${hrv>0?'min(offer,HRV)':'Offer'} minus deposit${c.ltv>0?` · <strong>${c.ltv}% LTV</strong>`:''}`);
+  cls(`principal-${id}`,'warn',noHRV);
+  txt(`mtgpm-${id}`, c.mtg>0?fmt(c.mtg,2):'-');
+  txt(`ct-${id}`, fmt(c.ct,2));
+  txt(`tot-upfront-${id}`, fmt(c.upfront));
+  txt(`tot-upfront-ea-${id}`, `per buyer: ${fmt(c.upfront/state.buyers)}`);
+  txt(`tot-monthly-${id}`, fmt(c.monthly,2));
+  txt(`tot-monthly-ea-${id}`, `per buyer: ${fmt(c.monthly/state.buyers,2)}`);
+  txt(`tot-year1-${id}`, fmt(c.upfront+c.monthly*12));
+  txt(`tot-year1-ea-${id}`, `per buyer: ${fmt((c.upfront+c.monthly*12)/state.buyers)}`);
+  txt(`tot-term-${id}`, c.mtg>0?fmt(c.mtg*(parseFloat(o.mortgageTerm)||25)*12):'-');
+  txt(`tot-term-lbl-${id}`, `${o.mortgageTerm||25} years`);
+
+  // Input validation
+  const dep=parseFloat(o.deposit)||0;
+  const rate=parseFloat(o.mortgageRate)||0;
+  const mortgeable=hrv>0?Math.min(offer,hrv):offer;
+  const depWarn=document.getElementById(`dep-warn-${id}`);
+  const rateWarn=document.getElementById(`rate-warn-${id}`);
+  if(depWarn){
+    if(offer>0&&dep>=offer){
+      depWarn.textContent='⚠ Deposit equals or exceeds offer amount';depWarn.style.display='';
+    } else if(offer>0&&mortgeable>0&&dep>=mortgeable){
+      depWarn.textContent='⚠ Deposit exceeds mortgageable amount (min of offer/HRV)';depWarn.style.display='';
+    } else {
+      depWarn.style.display='none';
+    }
+  }
+  if(rateWarn){
+    if(rate>20){
+      rateWarn.textContent=`⚠ Rate looks high - did you mean ${(rate/10).toFixed(2)}%?`;rateWarn.style.display='';
+    } else if(rate>0&&rate<0.1){
+      rateWarn.textContent='⚠ Rate looks very low - enter as a percentage e.g. 4.5';rateWarn.style.display='';
+    } else {
+      rateWarn.style.display='none';
+    }
+  }
+
+  renderComparison(); renderAffordability();
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+// Number inputs → soft update (no DOM rebuild, focus preserved)
+function updOfferNum(pid,oid,f,v){
+  const p=state.properties.find(p=>p.id===pid); if(!p)return;
+  const o=p.offers.find(o=>o.id===oid); if(!o)return;
+  o[f]=v; saveState(); softUpdate(p,o);
+}
+function updPropNum(pid,f,v){
+  const p=state.properties.find(p=>p.id===pid); if(!p)return;
+  p[f]=v; saveState();
+  const ct=calcCT(p.council,p.band);
+  const meta=document.getElementById(`pmeta-${pid}`);
+  if(meta) meta.textContent=`${p.council} · Band ${p.band}${p.hrv?' · HRV '+fmt(p.hrv):''} · Council Tax ~${fmt(ct,0)}/mo`;
+  for(const o of p.offers) softUpdate(p,o);
+}
+
+// Structural / select / toggle → full re-render
+function updPropSelect(pid,f,v){const p=state.properties.find(p=>p.id===pid);if(p){p[f]=v;render();}}
+function updPropStr(pid,f,v){const p=state.properties.find(p=>p.id===pid);if(p){p[f]=v;saveState();}}
+function updOfferToggle(pid,oid,f,v){
+  const p=state.properties.find(p=>p.id===pid); if(!p)return;
+  const o=p.offers.find(o=>o.id===oid); if(!o)return;
+  o[f]=v;
+  if(f==='isFirstTimeBuyer'&&v) o.isAdditionalDwelling=false;
+  if(f==='isAdditionalDwelling'&&v) o.isFirstTimeBuyer=false;
+  render();
+}
+
+function updBuyers(v){state.buyers=parseInt(v)||1;render();}
+function updIncludeCT(v){state.includeCT=v;render();}
+function addProperty(){state.properties.push(newProp());render();setTimeout(()=>document.querySelector('.property-card:last-child')?.scrollIntoView({behavior:'smooth',block:'center'}),50);}
+function removeProp(id){if(!confirm('Remove this property?'))return;state.properties=state.properties.filter(p=>p.id!==id);render();toast('Property removed');}
+function toggleProp(id){const p=state.properties.find(p=>p.id===id);if(p){p.collapsed=!p.collapsed;render();}}
+function addOffer(pid){const p=state.properties.find(p=>p.id===pid);if(p){p.offers.push(newOffer());render();}}
+function removeOffer(pid,oid){const p=state.properties.find(p=>p.id===pid);if(p){p.offers=p.offers.filter(o=>o.id!==oid);render();}}
+function toggleOffer(pid,oid){const p=state.properties.find(p=>p.id===pid);if(!p)return;const o=p.offers.find(o=>o.id===oid);if(o){o.collapsed=!o.collapsed;render();}}
+function dupOffer(pid,oid){
+  const p=state.properties.find(p=>p.id===pid); if(!p)return;
+  const o=p.offers.find(o=>o.id===oid); if(!o)return;
+  const clone={...o,id:uid(),offerAmount:'',collapsed:false};
+  p.offers.push(clone); render();
+  setTimeout(()=>document.getElementById('offer-'+clone.id)?.scrollIntoView({behavior:'smooth',block:'center'}),50);
+}
+
+// ── COMPARISON TABLE ──────────────────────────────────────────────────────
+function renderComparison(){
+  const sec=document.getElementById('comparison-section');
+  const tbl=document.getElementById('comparison-table');
+  const all=[];
+  for(const p of state.properties) for(const o of p.offers) if(o.offerAmount) all.push({p,o,c:compute(o,p)});
+  if(all.length<2){sec.style.display='none';return;}
+  sec.style.display='block';
+  const byP=state.properties.map(p=>({p,offers:p.offers.filter(o=>o.offerAmount).map(o=>({o,c:compute(o,p)}))})).filter(x=>x.offers.length);
+  if(!byP.length){sec.style.display='none';return;}
+  let head=`<tr><th style="width:180px">Cost Item</th>`;
+  for(const{p,offers}of byP) head+=`<th class="prop-col" colspan="${offers.length}">${esc(p.name||'Unnamed')}</th>`;
+  head+=`</tr><tr><th></th>`;
+  for(const{p,offers}of byP) for(let i=0;i<offers.length;i++){
+    const sep=i===0?'border-left:3px solid var(--navy-mid)':'';
+    head+=`<th style="background:var(--navy-light);font-size:11px;text-align:center;${sep}">Offer ${i+1}<br><span style="opacity:.8">${fmt(offers[i].o.offerAmount)}</span></th>`;
+  }
+  head+='</tr>';
+  const rows=[
+    {l:'Offer Amount',       fn:(o,c)=>fmt(parseFloat(o.offerAmount)||0)},
+    {l:'Amount Over HRV',    fn:(o,c)=>c.overHRV>0?fmt(c.overHRV):'-'},
+    {l:'LBTT',               fn:(o,c)=>fmt(c.lbtt)},
+    {l:'Deposit',            fn:(o,c)=>fmt(c.deposit)},
+    {l:'Solicitor Fees',     fn:(o,c)=>fmt(c.sol)},
+    {l:'TOTAL Upfront',      fn:(o,c)=>fmt(c.upfront),sub:true},
+    {l:'Per Buyer',        fn:(o,c)=>fmt(c.upfront/state.buyers),sub:true},
+    {l:'Mortgage PM',        fn:(o,c)=>fmt(c.mtg,2)},
+    {l:'Council Tax PM',     fn:(o,c)=>fmt(c.ct,2)},
+    {l:'Other Bills PM',     fn:(o,c)=>fmt(c.other,2)},
+    {l:'TOTAL Monthly',      fn:(o,c)=>fmt(c.monthly,2),tot:true},
+    {l:'Each Person (mo.)',  fn:(o,c)=>fmt(c.monthly/state.buyers,2),tot:true},
+  ];
+  const body=rows.map(row=>{
+      const cls=row.tot?'tot-row':row.sub?'sub-row':'';
+      // Collect raw numeric values to find the best (lowest) across all offers
+      const allOffers=byP.flatMap(({offers})=>offers);
+      const vals=allOffers.map(({o,c})=>{const raw=parseFloat(row.fn(o,c).replace(/[^0-9.]/g,''));return isNaN(raw)?null:raw;});
+      const validVals=vals.filter(v=>v!==null);
+      const best=validVals.length>1?Math.min(...validVals):null;
+      let cells='';let vi=0;
+      for(const{p,offers}of byP) for(let i=0;i<offers.length;i++){
+        const{o,c}=offers[i];
+        const sep=i===0?' prop-sep':'';
+        const isBest=best!==null&&vals[vi]===best;
+        const bestCls=(row.tot||row.sub)&&isBest?' best':'';
+        cells+=`<td class="num${sep}${bestCls}">${row.fn(o,c)}</td>`;
+        vi++;
+      }
+      return`<tr class="${cls}"><td class="row-label">${row.l}</td>${cells}</tr>`;
+    }).join('');
+  tbl.innerHTML=`<thead>${head}</thead><tbody>${body}</tbody>`;
+}
+
+// ── AFFORDABILITY ─────────────────────────────────────────────────────────
+function toggleAffordability(){
+  state.affordOpen=!state.affordOpen;
+  document.getElementById('afford-body').classList.toggle('open',state.affordOpen);
+  document.getElementById('afford-chevron').textContent=state.affordOpen?'▲ collapse':'▼ expand';
+  saveState();
+}
+function renderAffordability(){
+  const el=document.getElementById('afford-bars'); if(!el)return;
+  const income=parseFloat(document.getElementById('afford-income')?.value)||0;
+  const all=[];
+  for(const p of state.properties) for(const o of p.offers) if(o.offerAmount) all.push({p,o,c:compute(o,p)});
+  if(!all.length){el.innerHTML='<p style="font-size:13px;color:var(--slate-light)">Add some offers above to see affordability here.</p>';return;}
+  if(!income){el.innerHTML='<p style="font-size:13px;color:var(--slate-light)">Enter your combined monthly take-home above.</p>';return;}
+  el.innerHTML=all.map(({p,o,c})=>{
+    const pct=Math.min((c.monthly/income)*100,100);
+    const cls=pct<30?'green':pct<40?'amber':'red';
+    const lbl=`${esc(p.name||'Property')} - ${fmt(o.offerAmount)}`;
+    return`<div class="afford-bar-row"><div class="afford-bar-label" title="${lbl}">${lbl}</div><div class="afford-bar-track"><div class="afford-bar-fill ${cls}" style="width:${pct.toFixed(1)}%">${pct>15?pct.toFixed(0)+'%':''}</div></div><span style="font-size:12px;color:var(--slate);width:50px;text-align:right">${fmt(c.monthly,0)}/mo</span></div>`;
+  }).join('');
+}
+
+// ── PERSISTENCE ───────────────────────────────────────────────────────────
+function saveState(){try{localStorage.setItem('offerready_v2',JSON.stringify(state));}catch(e){}}
+function loadState(){try{const s=localStorage.getItem('offerready_v2');if(s){const d=JSON.parse(s);state.properties=d.properties||[];state.affordOpen=d.affordOpen||false;state.buyers=d.buyers||2;state.affordIncome=d.affordIncome||'';state.includeCT=d.includeCT!==undefined?d.includeCT:true;}}catch(e){}}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+function exportPDF(){
+  const rows=[
+    {l:'Offer Amount',      fn:(o,c)=>fmt(parseFloat(o.offerAmount)||0)},
+    {l:'Home Report Value', fn:(o,c,p)=>p.hrv?fmt(p.hrv):'-'},
+    {l:'Amount Over HRV',   fn:(o,c)=>c.overHRV>0?fmt(c.overHRV):'-'},
+    {l:'LBTT',              fn:(o,c)=>fmt(c.lbtt)},
+    {l:'Deposit',           fn:(o,c)=>fmt(c.deposit)},
+    {l:'Solicitor Fees',    fn:(o,c)=>fmt(c.sol)},
+    {l:'Total Upfront',     fn:(o,c)=>fmt(c.upfront),  bold:true},
+    {l:'Per Buyer (upfront)',fn:(o,c)=>fmt(c.upfront/state.buyers), bold:true},
+    {l:'──────────────',    fn:()=>''},
+    {l:'Mortgage PM',       fn:(o,c)=>fmt(c.mtg,2)},
+    {l:'Council Tax PM',    fn:(o,c)=>fmt(c.ct,2)},
+    {l:'Other Bills PM',    fn:(o,c)=>fmt(c.other,2)},
+    {l:'Total Monthly',     fn:(o,c)=>fmt(c.monthly,2), bold:true},
+    {l:'Per Buyer (monthly)',fn:(o,c)=>fmt(c.monthly/state.buyers,2), bold:true},
+    {l:'Year 1 Total',      fn:(o,c)=>fmt(c.upfront+c.monthly*12)},
+  ];
+  const tablesHTML=state.properties.map(p=>{
+    const offers=p.offers.filter(o=>o.offerAmount);
+    if(!offers.length) return '';
+    const ct=calcCT(p.council,p.band);
+    const offerHeaders=offers.map((_,i)=>`<th>Offer ${i+1}</th>`).join('');
+    const bodyRows=rows.map(row=>{
+      const cells=offers.map(o=>{const c=compute(o,p);return`<td>${row.fn(o,c,p)}</td>`;}).join('');
+      return`<tr${row.bold?' class="bold"':''}><td class="lbl">${row.l}</td>${cells}</tr>`;
+    }).join('');
+    return`<div class="prop-block">
+      <h2>${esc(p.name||'Unnamed Property')}</h2>
+      <p class="meta">${p.council} · Band ${p.band} · Council Tax ~${fmt(ct,0)}/mo${p.hrv?' · HRV '+fmt(p.hrv):''}</p>
+      <table><thead><tr><th>Cost Item</th>${offerHeaders}</tr></thead><tbody>${bodyRows}</tbody></table>
+    </div>`;
+  }).join('');
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>OfferReady Scotland - Summary</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Georgia,serif;font-size:13px;color:#0f172a;padding:32px;background:white}
+    h1{font-size:22px;margin-bottom:4px;color:#0f1f35}
+    .subtitle{font-size:12px;color:#64748b;margin-bottom:28px}
+    .prop-block{margin-bottom:36px;page-break-inside:avoid}
+    h2{font-size:17px;color:#0f1f35;margin-bottom:2px;border-bottom:2px solid #1a7f4b;padding-bottom:6px}
+    .meta{font-size:11px;color:#64748b;margin-bottom:10px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{background:#0f1f35;color:white;padding:8px 10px;text-align:right;font-weight:600}
+    th:first-child{text-align:left}
+    td{padding:7px 10px;border-bottom:1px solid #e2e8f0;text-align:right}
+    td.lbl{text-align:left;color:#475569;background:#f8fafc;font-weight:500}
+    tr.bold td{font-weight:700;background:#e6f4ed;color:#0f1f35}
+    tr.bold td.lbl{color:#1a7f4b}
+    tr:last-child td{border-bottom:none}
+    .footer{margin-top:32px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px}
+  </style></head><body>
+  <h1>OfferReady Scotland - Property Summary</h1>
+  <p class="subtitle">Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${state.buyers} buyer${state.buyers>1?'s':''}</p>
+  ${tablesHTML}
+  <div class="footer">OfferReady.co.uk · For guidance only - not financial or legal advice. Council tax figures 2025/26.</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{win.print();},400);
+}
+function shareState(){
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  const url=window.location.href.split('#')[0]+'#'+encoded;
+  navigator.clipboard.writeText(url).then(()=>toast('Link copied to clipboard!')).catch(()=>{
+    prompt('Copy this link:',url);
+  });
+}
+function loadFromHash(){
+  const hash=window.location.hash.slice(1);
+  if(!hash)return;
+  try{
+    const decoded=JSON.parse(decodeURIComponent(escape(atob(hash))));
+    if(!decoded.properties?.length)return;
+    const hasExisting=state.properties&&state.properties.length>0;
+    if(hasExisting){
+      if(!confirm('This link contains shared property data. Load it? Your current data will be replaced.'))return;
+    }
+    state.properties=decoded.properties||[];
+    state.buyers=decoded.buyers||2;
+    state.affordOpen=decoded.affordOpen||false;
+    state.affordIncome=decoded.affordIncome||'';
+    saveState();
+    var _bs=document.getElementById('global-buyers');if(_bs)_bs.value=String(state.buyers);
+    var _ai=document.getElementById('afford-income');if(_ai&&state.affordIncome)_ai.value=String(state.affordIncome);
+    var _ct=document.getElementById('global-ct');if(_ct)_ct.checked=state.includeCT!==false;
+    render();
+    window.location.hash='';
+    toast('Shared data loaded!');
+  }catch(e){
+    console.warn('Failed to load from URL hash',e);
+  }
+}
+function clearAll(){if(!confirm('Clear everything and start over? This cannot be undone.'))return;state={properties:[],affordOpen:false,buyers:2,affordIncome:'',includeCT:true};var _bs=document.getElementById('global-buyers');if(_bs)_bs.value='2';var _ct=document.getElementById('global-ct');if(_ct)_ct.checked=true;render();toast('Cleared - fresh start!');}
+function showPrivacy(){alert('OfferReady Privacy Policy\n\nAll data is stored in your browser\'s localStorage only. Nothing is ever sent to any server.\n\nThis tool uses no analytics, no tracking and no cookies. We do not collect, store or share any information about you or your searches.\n\nContact: contact@offerready.co.uk');}// ── INIT ──────────────────────────────────────────────────────────────────
+loadState();
+loadFromHash();
+
+var _bs=document.getElementById('global-buyers');if(_bs)_bs.value=String(state.buyers||2);
+var _ai=document.getElementById('afford-income');if(_ai&&state.affordIncome)_ai.value=String(state.affordIncome);
+if(state.affordOpen){
+  document.getElementById('afford-body')?.classList.add('open');
+  const ch=document.getElementById('afford-chevron');if(ch)ch.textContent='▲ collapse';
+}
+render();
+</script>
+</body>
+</html>
