@@ -325,7 +325,7 @@ const COUNCILS={
   "Clackmannanshire":1594.38,"Dumfries & Galloway":1454.98,"Dundee City":1605.34,
   "East Ayrshire":1606.44,"East Dunbartonshire":1599.70,"East Lothian":1579.18,
   "East Renfrewshire":1528.44,"Edinburgh, City of":1563.51,"Na h-Eileanan Siar":1387.56,
-  "Falkirk":1576.77,"Fife":1498.76,"Glasgow City":1611.00,"Highland":1527.09,
+  "Falkirk":1576.77,"Fife":1498.76,"Glasgow City":1706.00,"Highland":1527.09,
   "Inverclyde":1551.30,"Midlothian":1666.20,"Moray":1573.76,"North Ayrshire":1553.77,
   "North Lanarkshire":1452.86,"Orkney Islands":1574.60,"Perth & Kinross":1537.04,
   "Renfrewshire":1572.61,"Scottish Borders":1491.72,"Shetland Islands":1386.67,
@@ -338,6 +338,8 @@ const BANDS={"A":240/360,"B":280/360,"C":320/360,"D":1,"E":473/360,"F":585/360,"
 // Update each April from the Scottish Water Unmetered Household Charges leaflet.
 const SW_WATER=   {"A":185.28,"B":216.16,"C":247.04,"D":277.92,"E":339.68,"F":401.44,"G":463.20,"H":555.84};
 const SW_SEWERAGE={"A":214.98,"B":250.81,"C":286.64,"D":322.47,"E":394.13,"F":465.79,"G":537.45,"H":644.94};
+const GLASGOW_SW_WATER=   {"A":201.30,"B":234.85,"C":268.40,"D":301.95,"E":369.05,"F":436.15,"G":503.25,"H":603.90};
+const GLASGOW_SW_SEWERAGE={"A":233.58,"B":272.51,"C":311.44,"D":350.37,"E":428.23,"F":506.09,"G":583.95,"H":700.74};
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let state={properties:[],affordOpen:false,buyers:2,affordIncome:'',includeCT:true};
@@ -368,7 +370,8 @@ function calcMortgage(offer,deposit,hrv,rate,term){
 }
 function calcCT(council,band){
   const ct=(COUNCILS[council]||0)*(BANDS[band]||1);
-  const sw=(SW_WATER[band]||0)+(SW_SEWERAGE[band]||0);
+  const isGlasgow=council==='Glasgow City';
+  const sw=(isGlasgow?GLASGOW_SW_WATER[band]:SW_WATER[band]||0)+(isGlasgow?GLASGOW_SW_SEWERAGE[band]:SW_SEWERAGE[band]||0);
   return Math.round((ct+sw)/12*100)/100;
 }
 function compute(o,p){
