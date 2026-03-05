@@ -88,6 +88,7 @@ input[type=number]{-moz-appearance:textfield}
 
 .offer-card{border:1.5px solid var(--border);border-radius:8px;overflow:visible;background:#fafbfc}
 .offer-card-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--navy-light);color:white;border-radius:8px 8px 0 0}
+.offer-chevron-wrap{display:flex;align-items:center}
 .offer-card-header.collapsed{border-radius:8px}
 .offer-number{width:24px;height:24px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
 .offer-headline{flex:1;font-size:14px;font-weight:500}
@@ -180,41 +181,45 @@ body{overflow-x:hidden}
 @media(max-width:640px){
   .site-header{padding:0 12px}
   .header-inner{height:52px;gap:8px}
-  .logo-sub{font-size:11px;margin-left:4px}.save-status{display:none}
+  .logo-sub{font-size:11px;margin-left:4px}
+  .save-status{display:none}
   .logo{font-size:20px}
   .header-actions{gap:6px}
-  .hero{padding:28px 20px}.hero h1{font-size:26px}.hero p{font-size:13px}.hero::after{display:none}.hero::before{display:none}
+  .desktop-only{display:none}
+  .header-btn-label{display:block}
+  .hero{padding:28px 20px}
+  .hero h1{font-size:26px}
+  .hero p{font-size:13px}
+  .hero::after,.hero::before{display:none}
   .main{padding:16px 12px 60px}
   #settings-strip{padding:10px 14px;gap:12px}
   .property-header{padding:12px 14px}
   .property-body{padding:14px}
   .property-settings{grid-template-columns:1fr 1fr;gap:10px}
-  .offer-grid{grid-template-columns:1fr 1fr}
-  .offer-body{padding:10px}
-  .offer-card-header{flex-wrap:wrap;gap:6px}
+  .section-header{flex-wrap:wrap;gap:8px}
+  .section-title{font-size:19px}
+  .offer-card-header{flex-wrap:wrap;gap:6px;padding:12px 10px}
+  .offer-number{order:1;flex-shrink:0}
+  .offer-headline{order:2;flex:1;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .offer-headline span{margin-left:0}
+  .offer-card-header .btn{order:3;margin-top:4px}
+  .offer-chevron-wrap{order:3;margin-top:4px;margin-left:auto}
+  .offer-body{padding:14px 12px}
+  .offer-grid{grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .offer-divider{margin:22px 0 14px}
+  .offer-divider-label{font-size:9px}
   .offer-totals{grid-template-columns:repeat(2,1fr)}
   .offer-totals .total-cell:nth-child(2){border-right:none}
   .offer-totals .total-cell:nth-child(3){border-top:1px solid var(--border)}
-  .section-header{flex-wrap:wrap;gap:8px}
-  .section-title{font-size:19px}
+  .total-cell{padding:12px 8px}
+  .total-value{font-size:16px}
+  .total-each{font-size:10px}
   .afford-bar-row{flex-wrap:wrap}
   .afford-bar-label{width:auto;flex:1;font-size:12px}
   .afford-bar-track{order:3;flex:0 0 100%;margin-top:4px}
   .afford-bar-row>span{font-size:12px;text-align:right}
   .tooltip-box{left:auto;right:0;transform:none}
   .tooltip-box::after{left:auto;right:12px;transform:none}
-  .desktop-only{display:none}
-  .header-btn-label{display:block}
-  .offer-card-header{gap:6px;padding:12px 10px}
-  .offer-headline{font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
-  .offer-headline span{margin-left:0}
-  .offer-body{padding:14px 12px}
-  .offer-grid{gap:14px;margin-bottom:16px}
-  .offer-divider{margin:22px 0 14px}
-  .offer-divider-label{font-size:9px}
-  .total-cell{padding:12px 8px}
-  .total-value{font-size:16px}
-  .total-each{font-size:10px}
   .info-box{font-size:11px;padding:8px 10px;margin-bottom:16px}
   .field input,.field select{padding:10px 12px;font-size:15px}
 }
@@ -236,9 +241,9 @@ body{overflow-x:hidden}
     </a>
     <div class="header-actions">
       <span class="save-status"><span class="save-dot"></span>Saved locally</span>
-      <button class="btn btn-sm header-action-btn" style="background:white;color:var(--navy);font-weight:600;border:none" onclick="exportPDF()"><span class="header-btn-icon">⬇</span><span class="header-btn-label">Export PDF</span></button>
-      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="shareState()"><span class="header-btn-icon">⤴</span><span class="header-btn-label">Share</span></button>
-      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="clearAll()"><span class="header-btn-icon">↺</span><span class="header-btn-label">Clear</span></button>
+      <button class="btn btn-sm header-action-btn" style="background:white;color:var(--navy);font-weight:600;border:none" onclick="exportPDF()"><span class="header-btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--navy)" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"></path></svg></span><span class="header-btn-label">Export PDF</span></button>
+      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="shareState()"><span class="header-btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="rgba(255,255,255,.5)" viewBox="0 0 256 256"><path d="M229.66,109.66l-48,48a8,8,0,0,1-11.32-11.32L204.69,112H165a88,88,0,0,0-85.23,66,8,8,0,0,1-15.5-4A103.94,103.94,0,0,1,165,96h39.71L170.34,61.66a8,8,0,0,1,11.32-11.32l48,48A8,8,0,0,1,229.66,109.66ZM192,208H40V88a8,8,0,0,0-16,0V216a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16Z"></path></svg></span><span class="header-btn-label">Share</span></button>
+      <button class="btn btn-sm header-action-btn" style="background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2)" onclick="clearAll()"><span class="header-btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="rgba(255,255,255,.5)" viewBox="0 0 256 256"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"></path></svg></span><span class="header-btn-label">Clear</span></button>
     </div>
   </div>
 </header>
@@ -452,7 +457,7 @@ function renderOfferCard(o,oi,p){
   <div class="offer-card-header ${o.collapsed?'collapsed':''}" onclick="toggleOffer('${p.id}','${i}')" style="cursor:pointer">
     <div class="offer-number">${oi+1}</div>
     <div class="offer-headline" id="ohl-${i}">${offerHeadlineHTML(o,c)}</div>
-    <span class="property-chevron ${o.collapsed?'':'open'}" style="opacity:.6;font-size:11px;margin-right:4px">▼</span>
+    <div class="offer-chevron-wrap"><span class="property-chevron ${o.collapsed?'':'open'}" style="opacity:.6;font-size:11px">▼</span></div>
     <button class="btn btn-ghost btn-sm" style="padding:5px 9px;border-color:rgba(255,255,255,.3);color:white;background:rgba(255,255,255,.08)" onclick="event.stopPropagation();dupOffer('${p.id}','${i}')" title="Duplicate offer">⧉ Duplicate</button>
     <button class="btn btn-danger btn-sm" style="padding:5px 9px" onclick="event.stopPropagation();removeOffer('${p.id}','${i}')">✕</button>
   </div>
@@ -813,9 +818,14 @@ function exportPDF(){
 function shareState(){
   const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(state))));
   const url=window.location.href.split('#')[0]+'#'+encoded;
-  navigator.clipboard.writeText(url).then(()=>toast('Link copied to clipboard!')).catch(()=>{
-    prompt('Copy this link:',url);
-  });
+  if(navigator.share){
+    navigator.share({title:'OfferReady Scotland',text:'Check out my property comparison',url:url})
+    .catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(url).then(()=>toast('Link copied to clipboard!')).catch(()=>{
+      prompt('Copy this link:',url);
+    });
+  }
 }
 function loadFromHash(){
   const hash=window.location.hash.slice(1);
